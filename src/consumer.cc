@@ -47,6 +47,7 @@ Consumer::Init() {
     Nan::SetPrototypeMethod(tpl, "pause", WRAPPED_METHOD_NAME(Pause));
     Nan::SetPrototypeMethod(tpl, "resume", WRAPPED_METHOD_NAME(Resume));
     Nan::SetPrototypeMethod(tpl, "get_metadata", WRAPPED_METHOD_NAME(GetMetadata));
+    Nan::SetPrototypeMethod(tpl, "close", WRAPPED_METHOD_NAME(Close));
 
     constructor.Reset(tpl->GetFunction());
 }
@@ -347,6 +348,28 @@ WRAPPED_METHOD(Consumer, Stop) {
     paused_ = true;
     looper_->stop();
     looper_ = nullptr;
+
+    return;
+}
+
+WRAPPED_METHOD(Consumer, Close) {
+    Nan::HandleScope scope;
+
+    if (kafka_client_) {
+        while (rd_kafka_outq_len(kafka_client_) > 0)
+            rd_kafka_poll(kafka_client_, 50);
+
+        for (auto& iter : topics_) {
+            rd_kafka_topic_destroy(iter.second);
+            iter.second = nullptr;
+        }
+
+        rd_kafka_destroy(kafka_client_);
+        kafka_client_ = nullptr;
+/*
+        rd_kafka_wait_destroyed(2000);
+*/
+    }
 
     return;
 }
