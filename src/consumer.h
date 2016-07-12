@@ -32,6 +32,7 @@ private:
     WRAPPED_METHOD_DECL(Pause);
     WRAPPED_METHOD_DECL(Resume);
     WRAPPED_METHOD_DECL(GetMetadata);
+    WRAPPED_METHOD_DECL(Rebalance);
 
     static Nan::Persistent<v8::Function> constructor;
 
