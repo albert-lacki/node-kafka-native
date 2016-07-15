@@ -102,7 +102,7 @@
               'MACOSX_DEPLOYMENT_TARGET': '10.11',
               'OTHER_CFLAGS' : ['-Wno-sign-compare', '-Wno-missing-field-initializers'],
             },
-            'libraries' : ['-lz']
+            'libraries' : ['-lz', '-lsasl2']
           }
         ],[
           'OS=="linux"',
