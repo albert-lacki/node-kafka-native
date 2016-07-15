@@ -47,6 +47,7 @@ Consumer::Init() {
     Nan::SetPrototypeMethod(tpl, "pause", WRAPPED_METHOD_NAME(Pause));
     Nan::SetPrototypeMethod(tpl, "resume", WRAPPED_METHOD_NAME(Resume));
     Nan::SetPrototypeMethod(tpl, "get_metadata", WRAPPED_METHOD_NAME(GetMetadata));
+    Nan::SetPrototypeMethod(tpl, "rebalance", WRAPPED_METHOD_NAME(Rebalance));
 
     constructor.Reset(tpl->GetFunction());
 }
@@ -318,6 +319,41 @@ WRAPPED_METHOD(Consumer, Start) {
     paused_ = false;
     looper_ = new ConsumerLoop(this, queue_);
     looper_->start();
+
+    return;
+}
+
+WRAPPED_METHOD(Consumer, Rebalance) {
+    Nan::HandleScope scope;
+
+    if (!looper_) {
+        Nan::ThrowError("consumer not started");
+        return;
+    }
+
+    // start was called
+    for (size_t i = 0; i < partitions_.size(); ++i) {
+        rd_kafka_consume_stop(topic_, partitions_[i]);
+    }
+
+    partitions_.clear();
+
+    if (info.Length() != 1 ||
+        !( info[0]->IsObject()) ) {
+        Nan::ThrowError("you must specify partition/offsets");
+        return;
+    }
+
+    Local<Object> offsets = info[0].As<Object>();
+    Local<Array> keys = Nan::GetOwnPropertyNames(offsets).ToLocalChecked();
+    for (size_t i = 0; i < keys->Length(); i++) {
+        Local<Value> key = Nan::Get(keys, i).ToLocalChecked();
+        uint32_t partition = key.As<Number>()->Uint32Value();
+        int64_t offset = Nan::Get(offsets, key).ToLocalChecked().As<Number>()->IntegerValue();
+
+        partitions_.push_back(partition);
+        rd_kafka_consume_start_queue(topic_, partition, offset, queue_);
+    }
 
     return;
 }
