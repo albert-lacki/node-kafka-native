@@ -22,19 +22,19 @@
             'xcode_settings': {
               'MACOSX_DEPLOYMENT_TARGET': '10.11'
             },
-            'libraries' : ['-lz']
+            'libraries' : ['-lz', '-lsasl2']
           }
         ],[
           'OS=="linux" and gcc_version<=46',
           {
             'cflags': ['-std=c++0x','-g'],
-            'libraries' : ['-lz']
+            'libraries' : ['-lz', '-lsasl2']
           }
         ],[
           'OS=="linux" and gcc_version>46',
           {
             'cflags': ['-std=c++11','-g'],
-            'libraries' : ['-lz']
+            'libraries' : ['-lz', '-lsasl2']
           }
         ]
       ]
