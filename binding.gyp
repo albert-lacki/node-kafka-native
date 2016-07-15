@@ -82,6 +82,7 @@
         "deps/librdkafka/src/rdkafka_range_assignor.c",
         "deps/librdkafka/src/rdkafka_request.c",
         "deps/librdkafka/src/rdkafka_roundrobin_assignor.c",
+        "deps/librdkafka/src/rdkafka_sasl.c",
         "deps/librdkafka/src/rdkafka_subscription.c",
         "deps/librdkafka/src/rdkafka_timer.c",
         "deps/librdkafka/src/rdkafka_topic.c",
