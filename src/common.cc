@@ -44,20 +44,6 @@ Common::Common(rd_kafka_type_t ktype, Local<Object> &options):
 
 Common::~Common()
 {
-    if (!options_.IsEmpty()) {
-        options_.Reset();
-    }
-
-    for (auto& iter : topics_) {
-        rd_kafka_topic_destroy(iter.second);
-        iter.second = nullptr;
-    }
-
-    if (kafka_client_) {
-        rd_kafka_destroy(kafka_client_);
-        kafka_client_ = nullptr;
-    }
-
     uv_mutex_destroy(&ke_queue_lock_);
     uv_close((uv_handle_t*)ke_async_, ke_async_destroy);
     ke_async_ = nullptr;
@@ -270,6 +256,20 @@ Common::stop_poll() {
 void
 Common::poll_stopped() {
     Unref();
+
+    if (!options_.IsEmpty()) {
+        options_.Reset();
+    }
+
+    for (auto& iter : topics_) {
+        rd_kafka_topic_destroy(iter.second);
+        iter.second = nullptr;
+    }
+
+    if (kafka_client_) {
+        rd_kafka_destroy(kafka_client_);
+        kafka_client_ = nullptr;
+    }
 }
 
 rd_kafka_topic_t*
